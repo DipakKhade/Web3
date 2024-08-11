@@ -14,7 +14,7 @@ function  getHash(str) {
     return hash
 }
 
-for(let i=111110;i<=1000000;i++){
+for(let i=0;i<=1000000;i++){
     let h=getHash('100xdevs'+i.toString())
     console.log(h)
     if(h.startsWith('00')){
