@@ -10,8 +10,10 @@ import {
 } from "@solana/wallet-adapter-react-ui";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import TokenLaunchPad from "./components/TokenLaunchpad";
+import { useState } from "react";
 
 function App() {
+  const [token, setToken] = useState(null);
   return (
     <>
       <ConnectionProvider
@@ -23,7 +25,12 @@ function App() {
           <WalletModalProvider>
             <WalletMultiButton />
             <WalletDisconnectButton />
-            <TokenLaunchPad />
+            <TokenLaunchPad
+              onTokenCreate={(tokenMint: any) => {
+                console.log("hello");
+                setToken(tokenMint);
+              }}
+            />
           </WalletModalProvider>
         </WalletProvider>
       </ConnectionProvider>
