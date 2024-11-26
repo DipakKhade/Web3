@@ -54,13 +54,33 @@ function SendSOL(){
         lamports:lamports*LAMPORTS_PER_SOL
 
       })
-    )
+    );
+
+    // const payer = new PublicKey("GjmrjWrLPn1ES6HXAhg2dBnvf5cWz4RbdsK3HsE3Lo8e")
+
+    // txn.partialSign(payer)
 
     txn.recentBlockhash= (await connection.getLatestBlockhash()).blockhash;
     txn.feePayer = new PublicKey("GjmrjWrLPn1ES6HXAhg2dBnvf5cWz4RbdsK3HsE3Lo8e");
 
-    const seriallizedTransaction = txn.serialize();
-    const signature = await connection.sendRawTransaction(seriallizedTransaction);
+    const seriallizedTransaction = txn.serialize({
+      requireAllSignatures:false,
+      verifySignatures:false
+    });
+    // const signature = await connection.sendRawTransaction(seriallizedTransaction);
+    console.log(seriallizedTransaction)
+
+    await fetch(`http://localhost:3000/txn`,{
+      method:"POST",
+      headers:{
+        "content-type":"application/jsono",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiZGlwYWsiLCJpZCI6MSwiaWF0IjoxNzMyNTk0MjY1fQ.SA_jILjifrBfZARv0HRR8LlyJ7UJIH9dsV0OnzLHBrk"
+      },
+      body:JSON.stringify({
+        txn:seriallizedTransaction.toString('base64')
+      })
+    })
+
 
   }
 

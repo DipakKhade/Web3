@@ -1,12 +1,14 @@
-import { Keypair } from '@solana/web3.js';
+import { Connection, Keypair, Transaction } from '@solana/web3.js';
 import bs58 from 'bs58';
 import express from 'express';
 import { db } from './db';
 import jwt from 'jsonwebtoken';
-
+import { authMiddleware } from './authMiddleware';
+import cors from 'cors'
 
 const app = express();
-app.use(express.json())
+app.use(express.json());
+app.use(cors())
 
 app.post('/signup', async (req, res) => {
 
@@ -71,7 +73,7 @@ app.post('/signin',async(req,res)=>{
   const token = jwt.sign({
     name:user.name,
     id:user.id
-  },"asd");
+  },process.env.JWT_SEC as string);
 
   res.json({
     token
@@ -80,7 +82,36 @@ app.post('/signin',async(req,res)=>{
   
 });
 
-app.post('/txn',async(req,res)=>{
+app.post('/txn', authMiddleware,async(req,res)=>{
+
+  const txn = req.body.txn;
+
+  const deTxn = Transaction.from(Buffer.from(txn,'base64'));
+
+  const wallet = await db.wallet.findFirst({
+    where:{
+      userId:req.userId
+    }
+  });
+
+  if(!wallet || !wallet.privateKey){
+    res.json({
+      message:"wallet not found"
+    });
+    return;
+  }
+  const privateKeyArray = Uint8Array.from(JSON.parse(wallet.privateKey));
+  const keypair = Keypair.fromSecretKey(privateKeyArray);
+  deTxn.sign(keypair);
+  const signedTxn = deTxn.serialize()
+
+  const connection = new Connection('https://api.devnet.solana.com')
+  const signature  = await connection.sendRawTransaction(signedTxn)
+
+  res.json({
+    signature
+  })
+
   
 })
 
