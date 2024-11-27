@@ -1,6 +1,6 @@
 import { Connection, Keypair, Transaction } from '@solana/web3.js';
 import bs58 from 'bs58';
-import express from 'express';
+import express, { json } from 'express';
 import { db } from './db';
 import jwt from 'jsonwebtoken';
 import { authMiddleware } from './authMiddleware';
@@ -82,37 +82,81 @@ app.post('/signin',async(req,res)=>{
   
 });
 
-app.post('/txn', authMiddleware,async(req,res)=>{
+// app.post('/txn', authMiddleware,async(req,res)=>{
 
+//   const txn = req.body.txn;
+
+//   const deTxn = Transaction.from(Buffer.from(txn,'base64'));
+
+//   const wallet = await db.wallet.findFirst({
+//     where:{
+//       userId:req.userId
+//     }
+//   });
+
+//   if(!wallet || !wallet.privateKey){
+//     res.json({
+//       message:"wallet not found"
+//     });
+//     return;
+//   }
+//   // const privateKeyArray = Uint8Array.from(wallet?.privateKey);
+//   // const privateKeyArray = new TextEncoder().encode(wallet.privateKey)
+//   console.log('wallet.privateKey',wallet.privateKey) 
+//   const privateKeyArray = Uint8Array.from(Buffer.from(wallet.privateKey, 'base64'));
+
+//   console.log('privateKeyArray',privateKeyArray)
+//     const keypair = Keypair.fromSecretKey(privateKeyArray);
+//   deTxn.sign(keypair);
+//   const signedTxn = deTxn.serialize()
+
+//   const connection = new Connection('https://api.devnet.solana.com')
+//   const signature  = await connection.sendRawTransaction(signedTxn)
+
+//   const id = Math.random()
+
+//   res.json({
+//     signature,
+//     id
+//   })
+//   return;
+  
+// });
+
+
+
+app.post('/txn',authMiddleware,async(req,res)=>{
   const txn = req.body.txn;
-
-  const deTxn = Transaction.from(Buffer.from(txn,'base64'));
-
+  console.log(txn)
+  const tx = Transaction.from(Buffer.from(txn));
   const wallet = await db.wallet.findFirst({
     where:{
       userId:req.userId
     }
   });
 
-  if(!wallet || !wallet.privateKey){
-    res.json({
-      message:"wallet not found"
-    });
-    return;
-  }
-  const privateKeyArray = Uint8Array.from(JSON.parse(wallet.privateKey));
-  const keypair = Keypair.fromSecretKey(privateKeyArray);
-  deTxn.sign(keypair);
-  const signedTxn = deTxn.serialize()
+  const encodedPrivetKey = new TextEncoder().encode(wallet?.privateKey)
+  const keyPair = Keypair.fromSecretKey(encodedPrivetKey)
+  tx.sign(keyPair);
 
-  const connection = new Connection('https://api.devnet.solana.com')
-  const signature  = await connection.sendRawTransaction(signedTxn)
+  const connection = new Connection('https://api.devnet.solana.com');
+
+  const sign =   await connection.sendTransaction(tx,[keyPair])
 
   res.json({
-    signature
+    message:sign,
+    id:Math.random()
   })
 
-  
+
+
+
+})
+
+
+app.get('/getTxnStatus/:id',authMiddleware,async(req,res)=>{
+  const id = req.params.id;
+
 })
 
 

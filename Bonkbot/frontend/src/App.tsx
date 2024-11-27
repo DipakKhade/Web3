@@ -17,19 +17,10 @@ import './App.css'
 
 function App() {
 
-  const network = WalletAdapterNetwork.Devnet;
-
-  const sendTxn = async() =>{
-
-  }
-
-
   return (
     <ConnectionProvider endpoint={`https://api.devnet.solana.com`}>
             <WalletProvider wallets={[]} autoConnect>
                 <WalletModalProvider>
-                    <WalletMultiButton />
-                    <WalletDisconnectButton />
                     <SendSOL/>
                 </WalletModalProvider>
             </WalletProvider>
@@ -49,7 +40,7 @@ function SendSOL(){
 
     const txn = new Transaction().add(
       SystemProgram.transfer({
-        fromPubkey:new PublicKey("GjmrjWrLPn1ES6HXAhg2dBnvf5cWz4RbdsK3HsE3Lo8e"),
+        fromPubkey:new PublicKey("8ZuJ91PZX9Y847kJco9KbY4USZqTKNL3FmGBZ2ZwMfAe"),
         toPubkey:new PublicKey(to),
         lamports:lamports*LAMPORTS_PER_SOL
 
@@ -61,7 +52,7 @@ function SendSOL(){
     // txn.partialSign(payer)
 
     txn.recentBlockhash= (await connection.getLatestBlockhash()).blockhash;
-    txn.feePayer = new PublicKey("GjmrjWrLPn1ES6HXAhg2dBnvf5cWz4RbdsK3HsE3Lo8e");
+    txn.feePayer = new PublicKey("8ZuJ91PZX9Y847kJco9KbY4USZqTKNL3FmGBZ2ZwMfAe");
 
     const seriallizedTransaction = txn.serialize({
       requireAllSignatures:false,
@@ -73,11 +64,11 @@ function SendSOL(){
     await fetch(`http://localhost:3000/txn`,{
       method:"POST",
       headers:{
-        "content-type":"application/jsono",
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiZGlwYWsiLCJpZCI6MSwiaWF0IjoxNzMyNTk0MjY1fQ.SA_jILjifrBfZARv0HRR8LlyJ7UJIH9dsV0OnzLHBrk"
+        "content-type":"application/json",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiZGlwYWsiLCJpZCI6MywiaWF0IjoxNzMyNzE5NDEyfQ.jUC-Ye6fQTvMDd5En6S_Bh_M2jxzcVvADuszTckYDAk"
       },
       body:JSON.stringify({
-        txn:seriallizedTransaction.toString('base64')
+        txn:seriallizedTransaction
       })
     })
 
