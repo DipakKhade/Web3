@@ -142,13 +142,11 @@ app.post('/txn',authMiddleware,async(req,res)=>{
   const connection = new Connection('https://api.devnet.solana.com');
 
   const sign =   await connection.sendTransaction(tx,[keyPair])
-
+ const id = Math.random()  // some logical id using that user call poll for the txn status
   res.json({
     message:sign,
-    id:Math.random()
+    id 
   })
-
-
 
 
 })
