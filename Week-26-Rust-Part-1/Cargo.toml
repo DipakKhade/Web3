@@ -1,0 +1,6 @@
+[package]
+name = "Week-26-Rust-Part-1"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
