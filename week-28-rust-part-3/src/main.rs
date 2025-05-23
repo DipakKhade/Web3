@@ -21,19 +21,10 @@ macro_rules! generate_function {
     };
 }
 
-fn main(){
-    let n = 3;
-    let n2=n;
-    println!("{},{}",n,n2);
-    generate_function!(String::from("asd1"),)
-}
-
 fn get_student_class(s:impl Student)->Option<u32>{
     Some(3)
 }
 
-
-//Write a macro that can take more than one function name as input and create functions for it
 macro_rules! define_my_function {
     ($t:ty) => {
         ::paste::paste! {
@@ -43,3 +34,20 @@ macro_rules! define_my_function {
         }
     };
 }
+
+fn main(){
+    let n = 3;
+    let n2=n;
+    println!("{},{}",n,n2);
+    define_my_function!(get_student_class);
+
+    {
+        println!("hello")
+    }
+}
+
+
+
+
+//Write a macro that can take more than one function name as input and create functions for it
+
